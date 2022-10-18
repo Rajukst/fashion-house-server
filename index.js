@@ -20,8 +20,7 @@ async function run() {
   try {
     await client.connect();
     const database = client.db("Fashion-House");
-    const Products = database.collection("Products");
-    const ProductImage= database.collection("product-image")
+    const ProductsDetails= database.collection("All-Products")
   
     // creating add doctors bio
     app.post("/add-product", async (req, res) => {
@@ -32,21 +31,34 @@ async function run() {
       console.log(productItem);
     });
     app.post('/pictures', async(req, res)=>{
+      const date= new Date();
+     const newDate= date.toLocaleDateString();
+     const status= "Live"
       const name= req.body.name;
-      const email= req.body.email;
+      const slug= req.body.slug;
+      const price= req.body.price;
+      const sku= req.body.sku;
+      const description= req.body.description;
+      const catagory= req.body.catagory;
+      const size= req.body.size;
+      const stock= req.body.stock;
      const pic= req.files.image;
      const picData= pic.data;
      const encodedPic= picData.toString('base64');
      const picBuffer= Buffer.from(encodedPic, 'base64');
+     const picTwo= req.files.imageTwo;
+     const picDataTwo= picTwo.data;
+     const encodedPicTwo= picDataTwo.toString('base64');
+     const picBufferTwo= Buffer.from(encodedPicTwo, 'base64');
      const overAll= {
-      name, email, image: picBuffer
+    status, newDate, name, slug, price, sku, description, catagory, size, stock, image: picBuffer, imageTwo: picBufferTwo
      }
-     const results= await ProductImage.insertOne(overAll)
+     const results= await ProductsDetails.insertOne(overAll)
       res.json(results);
       console.log(results)
     });
     app.get('/productes', async(req, res)=>{
-      const cursor= ProductImage.find({})
+      const cursor= ProductsDetails.find({})
       const products= await cursor.toArray();
       res.json(products);
     })
