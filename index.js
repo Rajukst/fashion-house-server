@@ -20,7 +20,8 @@ async function run() {
   try {
     await client.connect();
     const database = client.db("Fashion-House");
-    const ProductsDetails= database.collection("All-Products")
+    const ProductsDetails= database.collection("All-Products");
+    const userCollection= database.collection("All-Users")
   
     // creating add doctors bio
     app.post("/add-product", async (req, res) => {
@@ -136,45 +137,45 @@ async function run() {
     //   console.log("getting test", getLabTest);
     //   res.send(getLabTest);
     // });
-    // app.post('/users', async(req, res)=>{
-    //   const user= req.body;
-    //   const getUser= await userCollection.insertOne(user)
-    //   res.json(getUser)
-    //   console.log(getUser)
-    // })
+    app.post('/users', async(req, res)=>{
+      const user= req.body;
+      const getUser= await userCollection.insertOne(user)
+      res.json(getUser)
+      console.log(getUser)
+    })
     // for google sign in if user registred or not. 
     // (jodi user first time google sign in kore tahole database e add hobe..
     //    ar jodi same user abar login kore tahole database e add hobe na)
-    // app.put('/users', async(req, res)=>{
-    //   const user= req.body;
-    //   const filter= {email:user.email};
-    //   const options = {upsert: true};
-    //   const updateDoc= {$set:user}
-    //   const result= await userCollection.updateOne(filter, updateDoc, options);
-    //   res.json(result)
-    // })
+    app.put('/users', async(req, res)=>{
+      const user= req.body;
+      const filter= {email:user.email};
+      const options = {upsert: true};
+      const updateDoc= {$set:user}
+      const result= await userCollection.updateOne(filter, updateDoc, options);
+      res.json(result)
+    })
 
-    // app.put('/users/admin', async(req, res)=>{
-    //   const user= req.body;
-    //   console.log(user)
-    //   const filter={email: user.email};
-    //   const updateDoc= {$set:{role:'admin'}}
-    //   const result= await userCollection.updateOne(filter, updateDoc);
-    //   res.json(result)
-    // })
+    app.put('/users/admin', async(req, res)=>{
+      const user= req.body;
+      console.log(user)
+      const filter={email: user.email};
+      const updateDoc= {$set:{role:'admin'}}
+      const result= await userCollection.updateOne(filter, updateDoc);
+      res.json(result)
+    })
 
-    //verifying user is admin or just user
-    // app.get("/users/:email", async(req, res)=>{
-    //   const email= req.params.email;
-    //   const query= {email:email};
-    //   const user= await userCollection.findOne(query);
-    //   let isAdmin= false
-    //   if(user?.role==='admin'){
-    //     isAdmin= true
-    //   }
-    //   res.json({admin: isAdmin})
+    // verifying user is admin or just user
+    app.get("/users/:email", async(req, res)=>{
+      const email= req.params.email;
+      const query= {email:email};
+      const user= await userCollection.findOne(query);
+      let isAdmin= false
+      if(user?.role==='admin'){
+        isAdmin= true
+      }
+      res.json({admin: isAdmin})
    
-    // })
+    })
 
   } finally {
     // client.close()
