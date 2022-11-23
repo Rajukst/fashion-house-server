@@ -1,14 +1,17 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require('body-parser');
 const { MongoClient } = require("mongodb");
 const fileUpload = require("express-fileupload");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const ObjectId = require("mongodb").ObjectId;
+
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.yyhry.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -21,7 +24,9 @@ async function run() {
     await client.connect();
     const database = client.db("Fashion-House");
     const ProductsDetails= database.collection("All-Products");
-    const userCollection= database.collection("All-Users")
+    const userCollection= database.collection("All-Users");
+    const orderCollection= database.collection("All-Orders");
+    const OrderInfo= database.collection("UserOrder");
   
     // creating add doctors bio
     app.post("/add-product", async (req, res) => {
@@ -62,7 +67,29 @@ async function run() {
       const cursor= ProductsDetails.find({})
       const products= await cursor.toArray();
       res.json(products);
-    })
+    });
+    app.get('/orders', async(req, res)=>{
+      const cursor= OrderInfo.find({})
+      const order= await cursor.toArray();
+      res.json(order);
+    });
+
+    app.post('/orderInfo', async(req, res)=>{
+      const orderInfo= req.body;
+      const gettingInfo= await OrderInfo.insertOne(orderInfo)
+      res.json(gettingInfo);
+      console.log(gettingInfo);
+    });
+
+    app.get("/productInfo/:userId", async (req, res) => {
+      const productId = req.params.userId;
+      const query = { _id: ObjectId(productId) };
+      const getViewProduct = await ProductsDetails.findOne(query);
+      console.log("getting single Doctor", getViewProduct);
+      res.send(getViewProduct);
+    });
+
+
     // app.get("/doctors", async (req, res) => {
     //   const cursor = DoctorsList.find({});
     //   const getDoctor = await cursor.toArray();
@@ -70,13 +97,7 @@ async function run() {
     //   console.log(getDoctor);
     // });
 
-    // app.get("/doctors/:serviceId", async (req, res) => {
-    //   const docId = req.params.serviceId;
-    //   const query = { _id: ObjectId(docId) };
-    //   const getDoctor = await DoctorsList.findOne(query);
-    //   console.log("getting single Doctor", getDoctor);
-    //   res.send(getDoctor);
-    // });
+ 
     // working on appointments
     // app.post("/appoints", async (req, res) => {
     //   const order = req.body;
