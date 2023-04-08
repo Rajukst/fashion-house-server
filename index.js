@@ -1,16 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require('body-parser');
 const { MongoClient } = require("mongodb");
-const fileUpload = require("express-fileupload");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 5000;
-const ObjectId = require("mongodb").ObjectId;
-
+const ObjectId= require("mongodb").ObjectId;
 app.use(cors());
 app.use(express.json());
-app.use(fileUpload());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.yyhry.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -22,181 +18,49 @@ console.log(uri);
 async function run() {
   try {
     await client.connect();
-    const database = client.db("Fashion-House");
-    const ProductsDetails= database.collection("All-Products");
-    const userCollection= database.collection("All-Users");
-    const orderCollection= database.collection("All-Orders");
-    const OrderInfo= database.collection("UserOrder");
+    const database = client.db("assignment_test");
+    const TestProductList = database.collection("testProduct");
+    const AllOrders= database.collection("all-orders")
   
+    // const UsersTestCollection = database.collection("Medical-Test");
+    // const userReview = database.collection("Reviews");
+    // const AppointBooking = database.collection("Appoints");
+    // const userCollection= database.collection('users')
     // creating add doctors bio
     app.post("/add-product", async (req, res) => {
       const add = req.body;
-      const productItem = await Products.insertOne(add);
-      console.log("getting a Product", productItem);
-      res.json(productItem);
-      console.log(productItem);
-    });
-    app.post('/pictures', async(req, res)=>{
-      const date= new Date();
-     const newDate= date.toLocaleDateString();
-     const status= "Live"
-      const name= req.body.name;
-      const slug= req.body.slug;
-      const price= req.body.price;
-      const sku= req.body.sku;
-      const description= req.body.description;
-      const catagory= req.body.catagory;
-      const size= req.body.size;
-      const stock= req.body.stock;
-     const pic= req.files.image;
-     const picData= pic.data;
-     const encodedPic= picData.toString('base64');
-     const picBuffer= Buffer.from(encodedPic, 'base64');
-     const picTwo= req.files.imageTwo;
-     const picDataTwo= picTwo.data;
-     const encodedPicTwo= picDataTwo.toString('base64');
-     const picBufferTwo= Buffer.from(encodedPicTwo, 'base64');
-     const overAll= {
-    status, newDate, name, slug, price, sku, description, catagory, size, stock, image: picBuffer, imageTwo: picBufferTwo
-     }
-     const results= await ProductsDetails.insertOne(overAll)
-      res.json(results);
-      console.log(results)
-    });
-    app.get('/productes', async(req, res)=>{
-      const cursor= ProductsDetails.find({})
-      const products= await cursor.toArray();
+      const products = await TestProductList.insertOne(add);
+      console.log("getting a Product", products);
       res.json(products);
+      console.log(products);
     });
-    app.get('/orders', async(req, res)=>{
-      const cursor= OrderInfo.find({})
-      const order= await cursor.toArray();
-      res.json(order);
-    });
-
-    app.post('/orderInfo', async(req, res)=>{
-      const orderInfo= req.body;
-      const gettingInfo= await OrderInfo.insertOne(orderInfo)
-      res.json(gettingInfo);
-      console.log(gettingInfo);
+    app.get("/products", async (req, res) => {
+      const cursor = TestProductList.find({});
+      const getProductList = await cursor.toArray();
+      res.send(getProductList);
+      console.log(getProductList);
     });
 
-    app.get("/productInfo/:userId", async (req, res) => {
-      const productId = req.params.userId;
-      const query = { _id: ObjectId(productId) };
-      const getViewProduct = await ProductsDetails.findOne(query);
-      console.log("getting single Doctor", getViewProduct);
-      res.send(getViewProduct);
-    });
-
-
-    // app.get("/doctors", async (req, res) => {
-    //   const cursor = DoctorsList.find({});
-    //   const getDoctor = await cursor.toArray();
-    //   res.send(getDoctor);
-    //   console.log(getDoctor);
-    // });
-
- 
-    // working on appointments
-    // app.post("/appoints", async (req, res) => {
-    //   const order = req.body;
-    //   const confirmAppoints = await AppointBooking.insertOne(order);
-    //   res.json(confirmAppoints);
-    // });
-
-    // app.get("/my-appoints", async (req, res) => {
-    //   const email = req.query.email;
-    //   const query = { email: email };
-    //   console.log(query);
-    //   const cursor = AppointBooking.find(query);
-    //   const getBooking = await cursor.toArray();
-    //   res.send(getBooking);
-    //   console.log(getBooking);
-    // });
-    // delete product from manage products
-
-    // app.delete("/delete/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: ObjectId(id) };
-    //   const result = await DoctorsList.deleteOne(query);
-    //   console.log("deleting product", result);
-    //   res.json(result);
-    // });
-    // creating user Review
-    // app.post("/get-review", async (req, res) => {
-    //   const add = req.body;
-    //   const doctorsReview = await userReview.insertOne(add);
-    //   console.log("getting a Doctor", doctorsReview);
-    //   res.json(doctorsReview);
-    //   console.log(doctorsReview);
-    // });
-    // app.get("/my-review", async (req, res) => {
-    //   const cursor = userReview.find({});
-    //   const getDoctorReview = await cursor.toArray();
-    //   res.send(getDoctorReview);
-    //   console.log(getDoctorReview);
-    // });
-    // adding medical test
-    // app.post("/add-test", async (req, res) => {
-    //   const add = req.body;
-    //   const getMedicalTest = await UsersTestCollection.insertOne(add);
-    //   console.log("getting a Doctor", getMedicalTest);
-    //   res.json(getMedicalTest);
-    //   console.log(getMedicalTest);
-    // });
-    // app.get("/all-test", async (req, res) => {
-    //   const cursor = UsersTestCollection.find({});
-    //   const getDoctor = await cursor.toArray();
-    //   res.send(getDoctor);
-    //   console.log(getDoctor);
-    // });
-    // app.get("/lab-test/:serviceId", async (req, res) => {
-    //   const docId = req.params.serviceId;
-    //   const query = { _id: ObjectId(docId) };
-    //   const getLabTest = await UsersTestCollection.findOne(query);
-    //   console.log("getting test", getLabTest);
-    //   res.send(getLabTest);
-    // });
-    app.post('/users', async(req, res)=>{
-      const user= req.body;
-      const getUser= await userCollection.insertOne(user)
-      res.json(getUser)
-      console.log(getUser)
+    app.post("/order-info", async(req, res)=>{
+      const addOrder= req.body;
+      const getOrder= await AllOrders.insertOne(addOrder)
+      res.json(getOrder)
+      console.log(getOrder);
     })
-    // for google sign in if user registred or not. 
-    // (jodi user first time google sign in kore tahole database e add hobe..
-    //    ar jodi same user abar login kore tahole database e add hobe na)
-    app.put('/users', async(req, res)=>{
-      const user= req.body;
-      const filter= {email:user.email};
-      const options = {upsert: true};
-      const updateDoc= {$set:user}
-      const result= await userCollection.updateOne(filter, updateDoc, options);
-      res.json(result)
+    app.get("/orders", async(req, res)=>{
+      const cursor= AllOrders.find({})
+      const getOrders= await cursor.toArray()
+      res.send(getOrders)
+      console.log(getOrders)
     })
+app.get("/products/:id", async(req, res)=>{
+  const productId= req.params.id;
+  const query = {_id: new ObjectId(productId)};
+  const getSingleProduct= await TestProductList.findOne(query);
+  console.log("getting a single product", getSingleProduct);
+  res.send(getSingleProduct);
+})
 
-    app.put('/users/admin', async(req, res)=>{
-      const user= req.body;
-      console.log(user)
-      const filter={email: user.email};
-      const updateDoc= {$set:{role:'admin'}}
-      const result= await userCollection.updateOne(filter, updateDoc);
-      res.json(result)
-    })
-
-    // verifying user is admin or just user
-    app.get("/users/:email", async(req, res)=>{
-      const email= req.params.email;
-      const query= {email:email};
-      const user= await userCollection.findOne(query);
-      let isAdmin= false
-      if(user?.role==='admin'){
-        isAdmin= true
-      }
-      res.json({admin: isAdmin})
-   
-    })
 
   } finally {
     // client.close()
