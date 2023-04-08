@@ -66,7 +66,7 @@ const query= {_id:ObjectId(id)}
 const result= await TestProductList.delete(query)
 res.json(result)
 })
-
+// 
   } finally {
     // client.close()
   }
