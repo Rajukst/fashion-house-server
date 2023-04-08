@@ -60,7 +60,12 @@ app.get("/products/:id", async(req, res)=>{
   console.log("getting a single product", getSingleProduct);
   res.send(getSingleProduct);
 })
-
+app.delete("/products/:id", async(req, res)=>{
+const id= req.params.id;
+const query= {_id:ObjectId(id)}
+const result= await TestProductList.delete(query)
+res.json(result)
+})
 
   } finally {
     // client.close()
